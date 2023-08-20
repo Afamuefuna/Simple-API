@@ -105,26 +105,27 @@ async function getDocumentsByEmailAndPassword(player_email, player_password) {
   }
 }
 
-async function searchByEmail(email) {
+async function searchByEmail(email, password) {
   try {
     const connection = await mysql.createConnection(connectionConfig);
 
-    const selectQuery = 'SELECT * FROM Players WHERE email = ?';
-    const selectValues = [email];
+    const selectQuery = 'SELECT * FROM Players WHERE email = ? AND password = ?';
+    const selectValues = [email, password];
 
     const [rows] = await connection.query(selectQuery, selectValues);
 
+    connection.end(); // Close the connection
+
     if (rows.length === 0) {
-      console.log('No data found for the email:', email);
+      console.log('No data found for the provided email and password.');
       return null;
     } else {
       console.log('Data retrieved successfully:', rows);
       return rows;
     }
-
-    connection.end(); // Close the connection
   } catch (error) {
-    console.error('Error searching by email:', error);
+    console.error('Error searching by email and password:', error);
+    throw error; // Rethrow the error to be handled by the calling code
   }
 }
 

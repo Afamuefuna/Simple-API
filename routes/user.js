@@ -42,10 +42,14 @@ router.get('/users', async (req, res) => {
 });
 
 
-router.get('/users/:email/', async (req, res) => {
+router.get('/users/:email/:password', async (req, res) => {
     console.log(req.params)
-    const getDetail = await searchByEmail(req.params.email);
-    res.json({ok: getDetail.length > 0, name: getDetail});
+    const getDetail = await searchByEmail(req.params.email, req.params.password);
+    if(getDetail != null){
+      res.json({ok: getDetail.length > 0, name: getDetail});
+    }else{
+      res.json({ok: false});
+    }
     
 });
 
