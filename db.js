@@ -29,7 +29,11 @@ async function createTable() {
         id INT AUTO_INCREMENT PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
         email VARCHAR(255) NOT NULL,
-        password VARCHAR(255) NOT NULL
+        password VARCHAR(255) NOT NULL,
+        gender VARCHAR(255) NOT NULL,
+        height VARCHAR(255) NOT NULL,
+        weight VARCHAR(255) NOT NULL,
+        bodyGoals VARCHAR(255) NOT NULL
       )
     `;
 
@@ -55,14 +59,8 @@ async function insertData(data) {
   try {
     const connection = await mysql.createConnection(connectionConfig);
 
-    data = {
-      name: 'John Doe',
-      email: 'john@example.com',
-      password: 'password123'
-    };
-
-    const insertQuery = 'INSERT INTO Players (name, email, password) VALUES (?, ?, ?)';
-    const insertValues = [data.name, data.email, data.password];
+    const insertQuery = 'INSERT INTO Players (name, email, password, gender, height, weight, bodyGoals) VALUES (?, ?, ?, ?, ?, ?, ?)';
+    const insertValues = [data.name, data.email, data.password, data.gender, data.height, data.weight, data.bodyGoals];
 
     const [result] = await connection.query(insertQuery, insertValues);
     console.log('Data inserted successfully:', result);

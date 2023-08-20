@@ -26,10 +26,10 @@ router.get('/users', async (req, res) => {
   });
 
   router.post('/adduser', (req, res) => {
-    const { name, email, firstName, lastName, gender, age, passWord } = req.body;
+    const { name, email, password, gender, height, weight, bodyGoals } = req.body;
 
     // Check if all required fields are present in the request body
-    if (name && email && firstName && lastName && gender && age && passWord) {
+    if (name && email && password && gender && height && weight && bodyGoals) {
         // Call a function named "insertData" to insert the user data into a database
         const insertedUser = insertData(req.body);
 
