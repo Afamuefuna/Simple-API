@@ -1,6 +1,6 @@
 const { MongoClient } = require('mongodb');
 
-const uri = 'mongodb://atlas-sql-64a372c9c7abff565ad87876-vhm8a.a.query.mongodb.net/Main?ssl=true&authSource=admin';
+const uri = 'mongodb+srv://Simon:binaryHack123@cluster0.flnz0tx.mongodb.net/?retryWrites=true&w=majority'; // MongoDB connection URI
 const client = new MongoClient(uri, { tls: true });
 
 const databaseName = "Main";
