@@ -1,6 +1,6 @@
 const { MongoClient } = require('mongodb');
 
-const uri = 'mongodb+srv://Simon:binaryHack123@cluster0.flnz0tx.mongodb.net/?retryWrites=true&w=majority'; // MongoDB connection URI
+const uri = 'mongodb+srv://Simon:binaryHack123@cluster0.flnz0tx.mongodb.net/?retryWrites=true&w=majority&tls=true&tlsAllowInvalidCertificates=true'; // MongoDB connection URI
 const client = new MongoClient(uri, { tls: true });
 
 const databaseName = "Main";
