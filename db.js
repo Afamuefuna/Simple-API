@@ -1,121 +1,138 @@
-const { MongoClient } = require('mongodb');
+const mysql = require('mysql2/promise');
 
-const uri = 'mongodb+srv://Simon:binaryHack123@cluster0.flnz0tx.mongodb.net/?retryWrites=true&w=majority&tls=true&tlsAllowInvalidCertificates=true'; // MongoDB connection URI
-const client = new MongoClient(uri, { tls: true });
+const connectionConfig = {
+  host: 'sql6.freesqldatabase.com', // MySQL server hostname
+  user: 'sql6641164',      // MySQL username
+  password: '4RUtg5sT1R', // MySQL password
+  database: 'sql6641164'   // MySQL database name
+};
 
-const databaseName = "Main";
-const collectionName = "Players";
+let connection; // MySQL connection object
 
 async function connect() {
-    try {
-      await client.connect(); // Connect to MongoDB
-      console.log('Connected to MongoDB');
-      // Additional setup or operations can be performed here
-      createDatabse(databaseName);
-    } catch (error) {
-      console.error('Error connecting to MongoDB:', error);
-    }
+  try {
+    connection = await mysql.createConnection(connectionConfig);
+    console.log('Connected to MySQL');
+    await createDatabase();
+    await createTable();
+  } catch (error) {
+    console.error('Error connecting to MySQL:', error);
   }
+}
 
-  async function createDatabse(name){
-    try{
-        const db = client.db(name);
-        await db.createCollection('Players');
-        console.log('Database created successfully')
-    }catch(error){
-        console.error('Error creating database: ' + error);
-    }
+async function createTable() {
+  try {
+    const connection = await mysql.createConnection(connectionConfig);
+
+    const createTableQuery = `
+      CREATE TABLE IF NOT EXISTS Players (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        email VARCHAR(255) NOT NULL,
+        password VARCHAR(255) NOT NULL
+      )
+    `;
+
+    await connection.query(createTableQuery);
+    console.log('Table "Players" created successfully');
+
+    connection.end(); // Close the connection
+  } catch (error) {
+    console.error('Error creating table:', error);
   }
+}
 
-  async function insertData(data) {
-    try {
-      const database = client.db(databaseName); // Replace 'myDatabase' with the desired database name
-      const collection = database.collection(collectionName); // Access the desired collection
-  
-      var result = await collection.insertOne(data); // Insert a single document
-
-      console.log(result)
-
-    } catch (error) {
-      console.error('Error inserting data:', error);
-    }
+async function createDatabase() {
+  try {
+    await connection.query(`CREATE DATABASE IF NOT EXISTS ${connectionConfig.database}`);
+    console.log('Database created successfully');
+  } catch (error) {
+    console.error('Error creating database:', error);
   }
+}
 
-  async function getAllData() {
-    try {
-      const database = client.db(databaseName); // Replace 'myDatabase' with the desired database name
-      const collection = database.collection(collectionName); // Access the desired collection
-  
-      const documents = await collection.find().toArray(); // Retrieve all documents
-  
-      documents.forEach(document => {
-        console.log(document);
-      });
+async function insertData(data) {
+  try {
+    const connection = await mysql.createConnection(connectionConfig);
 
-      return documents;
-    } catch (error) {
-      console.error('Error retrieving data:', error);
-    }
+    data = {
+      name: 'John Doe',
+      email: 'john@example.com',
+      password: 'password123'
+    };
+
+    const insertQuery = 'INSERT INTO Players (name, email, password) VALUES (?, ?, ?)';
+    const insertValues = [data.name, data.email, data.password];
+
+    const [result] = await connection.query(insertQuery, insertValues);
+    console.log('Data inserted successfully:', result);
+
+    connection.end(); // Close the connection
+  } catch (error) {
+    console.error('Error inserting data:', error);
   }
+}
 
-  async function getDocumentsByName(player_name) {
-    try {
-      const database = client.db(databaseName); // Replace 'myDatabase' with the desired database name
-      const collection = database.collection(collectionName); // Access the desired collection
-
-      const query = { name: player_name }; // Define the query to match documents with the specified name
-      console.log(player_name);
-
-      const documents = await collection.find(query).toArray(); // Retrieve documents matching the query
-
-      return documents;
-
-    } catch (error) {
-      console.error('Error retrieving data:', error);
-      throw error; // Rethrow the error to be handled by the calling code
-    }
+async function getAllData() {
+  try {
+    const [rows] = await connection.query('SELECT * FROM Players');
+    rows.forEach(row => {
+      console.log(row);
+    });
+    return rows;
+  } catch (error) {
+    console.error('Error retrieving data:', error);
   }
+}
 
-  async function getDocumentsByName(player_name) {
-    try {
-      const database = client.db(databaseName); // Replace 'myDatabase' with the desired database name
-      const collection = database.collection(collectionName); // Access the desired collection
-
-      const query = { name: player_name }; // Define the query to match documents with the specified name
-      console.log(player_name);
-
-      const documents = await collection.find(query).toArray(); // Retrieve documents matching the query
-
-      return documents;
-
-    } catch (error) {
-      console.error('Error retrieving data:', error);
-      throw error; // Rethrow the error to be handled by the calling code
-    }
+async function getDocumentsByName(player_name) {
+  try {
+    const [rows] = await connection.query('SELECT * FROM Players WHERE name = ?', [player_name]);
+    return rows;
+  } catch (error) {
+    console.error('Error retrieving data:', error);
+    throw error;
   }
+}
 
-  async function getDocumentsByEmailAndPassword(player_email, player_password) {
-      try {
-      const database = client.db(databaseName); // Replace 'myDatabase' with the desired database name
-      const collection = database.collection(collectionName); // Access the desired collection
-
-      const query = {
-        email: player_email,
-        password: player_password
-      };
-
-      const documents = await collection.find(query).toArray(); // Retrieve documents matching the query
-
-      return documents;
-
-    } catch (error) {
-      console.error('Error retrieving data:', error);
-      throw error; // Rethrow the error to be handled by the calling code
-    }
+async function getDocumentsByEmailAndPassword(player_email, player_password) {
+  try {
+    const [rows] = await connection.query('SELECT * FROM Players WHERE email = ? AND password = ?', [player_email, player_password]);
+    return rows;
+  } catch (error) {
+    console.error('Error retrieving data:', error);
+    throw error;
   }
+}
 
-  module.exports = {connect,
-    insertData,
-    getAllData,
-    getDocumentsByName,
-    getDocumentsByEmailAndPassword};
+async function searchByEmail(email) {
+  try {
+    const connection = await mysql.createConnection(connectionConfig);
+
+    const selectQuery = 'SELECT * FROM Players WHERE email = ?';
+    const selectValues = [email];
+
+    const [rows] = await connection.query(selectQuery, selectValues);
+
+    if (rows.length === 0) {
+      console.log('No data found for the email:', email);
+      return null;
+    } else {
+      console.log('Data retrieved successfully:', rows);
+      return rows;
+    }
+
+    connection.end(); // Close the connection
+  } catch (error) {
+    console.error('Error searching by email:', error);
+  }
+}
+
+module.exports = {
+  connect,
+  insertData,
+  getAllData,
+  getDocumentsByName,
+  getDocumentsByEmailAndPassword,
+  searchByEmail
+};

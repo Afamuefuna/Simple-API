@@ -4,6 +4,7 @@ const {insertData} = require("../db")
 const {getAllData} = require("../db")
 const {getDocumentsByName} = require("../db")
 const {getDocumentsByEmailAndPassword} = require("../db")
+const {searchByEmail} = require("../db");
 
 
 var router = express.Router();
@@ -41,9 +42,9 @@ router.get('/users', async (req, res) => {
 });
 
 
-router.get('/users/:email/:password', async (req, res) => {
+router.get('/users/:email/', async (req, res) => {
     console.log(req.params)
-    const getDetail = await getDocumentsByEmailAndPassword(req.params.email, req.params.password);
+    const getDetail = await searchByEmail(req.params.email);
     res.json({ok: getDetail.length > 0, name: getDetail});
     
 });
